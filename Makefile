@@ -41,21 +41,22 @@ clean:
 	rm -rf venv target src/*.pyc tests/*.pyc
 
 # Deploy a cloud formation containing the lambda
-deploy-lambda: COMMAND=$(shell if aws cloudformation get-template-summary --stack-name $(NAME) >/dev/null 2>&1; then \
+deploy-lambda: COMMAND=$(shell if aws cloudformation get-template-summary --region $(AWS_REGION) --stack-name $(NAME) >/dev/null 2>&1; then \
 			echo update; else echo create; fi)
 deploy-lambda: target/$(NAME)-$(VERSION).zip deploy
 	aws cloudformation $(COMMAND)-stack \
+				--region $(AWS_REGION) \
                 --capabilities CAPABILITY_IAM \
                 --stack-name $(NAME) \
                 --template-body file://cloudformation/secrets-manager-rsa-key-rotation.yaml \
                 --parameters \
                         ParameterKey=LambdaSourceBucket,ParameterValue=$(S3_BUCKET) \
                         ParameterKey=LambdaSourceKey,ParameterValue=lambdas/$(NAME)-$(VERSION).zip
-	aws cloudformation wait stack-$(COMMAND)-complete  --stack-name $(NAME)
+	aws cloudformation wait stack-$(COMMAND)-complete --region $(AWS_REGION) --stack-name $(NAME)
 
 delete-lambda:
-	aws cloudformation delete-stack --stack-name $(NAME)
-	aws cloudformation wait stack-delete-complete  --stack-name $(NAME)
+	aws cloudformation delete-stack --region $(AWS_REGION) --stack-name $(NAME)
+	aws cloudformation wait stack-delete-complete --region $(AWS_REGION) --stack-name $(NAME)
 
 
 # Deploy a cloud formation containing the lambda and a secret that uses the lambda
@@ -63,17 +64,18 @@ deploy-demo: COMMAND=$(shell if aws cloudformation get-template-summary --stack-
 			echo update; else echo create; fi)
 deploy-demo: target/$(NAME)-$(VERSION).zip deploy
 	aws cloudformation $(COMMAND)-stack \
+				--region $(AWS_REGION) \
                 --capabilities CAPABILITY_IAM \
                 --stack-name $(NAME)-demo \
                 --template-body file://cloudformation/secrets-manager-secret-with-rotation.yaml \
                 --parameters \
                         ParameterKey=LambdaSourceBucket,ParameterValue=$(S3_BUCKET) \
                         ParameterKey=LambdaSourceKey,ParameterValue=lambdas/$(NAME)-$(VERSION).zip
-	aws cloudformation wait stack-$(COMMAND)-complete  --stack-name $(NAME)-demo
+	aws cloudformation wait stack-$(COMMAND)-complete --region $(AWS_REGION) --stack-name $(NAME)-demo
 
 delete-demo:
-	aws cloudformation delete-stack --stack-name $(NAME)-demo
-	aws cloudformation wait stack-delete-complete  --stack-name $(NAME)-demo
+	aws cloudformation delete-stack --region $(AWS_REGION) --stack-name $(NAME)-demo
+	aws cloudformation wait stack-delete-complete --region $(AWS_REGION) --stack-name $(NAME)-demo
 
 
 # TODO
