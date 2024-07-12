@@ -8,6 +8,10 @@ If you want to store an RSA key pair in AWS Secrets Manager and have it automati
 * docker
 * make
 
+## Setup
+1. Copy `.release.example` fle and rename it as `.release`. Update values as needed.
+1. Copy `Makefile.user.example` fle and rename it as `Makefile.user`. Update values as needed.
+
 ## How to deploy into your AWS account:
 1. git clone https://github.com/brianrower/aws-secrets-manager-rsa-key-rotation-lambda.git
 2. cd aws-secrets-manager-rsa-key-rotation-lambda
