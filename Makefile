@@ -2,7 +2,7 @@ include Makefile.mk
 include Makefile.user
 
 NAME=secrets-manager-rsa-key-rotation
-S3_BUCKET=$(S3_BUCKET_PREFIX)-$(AWS_REGION)
+S3_BUCKET=$(S3_BUCKET_PREFIX)
 
 help:
 	@echo 'make                 - builds a zip file to target/.'
